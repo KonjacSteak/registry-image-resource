@@ -69,7 +69,12 @@ func (o *Out) Execute() error {
 
 	tagsToPush := []name.Tag{}
 
-	repo, err := name.NewRepository(req.Source.Repository)
+	var repo name.Repository
+	if req.Source.Insecure {
+		repo, err = name.NewRepository(req.Source.Repository, name.Insecure)
+	} else {
+		repo, err = name.NewRepository(req.Source.Repository)
+	}
 	if err != nil {
 		return fmt.Errorf("could not resolve repository: %w", err)
 	}

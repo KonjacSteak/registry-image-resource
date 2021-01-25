@@ -87,7 +87,14 @@ func (c *Check) Execute() error {
 }
 
 func check(source resource.Source, from *resource.Version) (resource.CheckResponse, error) {
-	repo, err := name.NewRepository(source.Repository)
+	var repo name.Repository
+	var err error
+	if source.Insecure {
+		repo, err = name.NewRepository(source.Repository, name.Insecure)
+	} else {
+		repo, err = name.NewRepository(source.Repository)
+	}
+
 	if err != nil {
 		return resource.CheckResponse{}, fmt.Errorf("resolve repository: %w", err)
 	}

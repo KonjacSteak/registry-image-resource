@@ -87,6 +87,8 @@ type Source struct {
 
 	ContentTrust *ContentTrust `json:"content_trust,omitempty"`
 
+	Insecure bool `json:"insecure,omitempty"`
+
 	Debug bool `json:"debug,omitempty"`
 }
 
