@@ -88,6 +88,8 @@ differences:
   * `tls_key`: *Optional. Default `""`* TLS key for the notary server.
   * `tls_cert`: *Optional. Default `""`* TLS certificate for the notary server.
 
+* `insecure`: *Optional.* When set to `true`, SSL verification is turned off.
+
 ### Signing with Docker Hub 
 
 Configure Docker Content Trust for use with the [Docker Hub](https:/hub.docker.io) and Notary service by specifying the above source parameters as follows:
