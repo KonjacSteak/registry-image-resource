@@ -92,12 +92,26 @@ type Source struct {
 	Debug bool `json:"debug,omitempty"`
 }
 
+func (source Source) NewRepository() (name.Repository, error) {
+	if source.Insecure {
+		return name.NewRepository(source.Repository, name.Insecure)
+	}
+	return name.NewRepository(source.Repository)
+}
+
+func (source Source) NewTag(tagName string) (name.Tag, error) {
+	if source.Insecure {
+		return name.NewTag(fmt.Sprintf("%s:%s", source.Repository, tagName), name.Insecure)
+	}
+	return name.NewTag(fmt.Sprintf("%s:%s", source.Repository, tagName))
+}
+
 func (source Source) Mirror() (Source, bool, error) {
 	if source.RegistryMirror == nil {
 		return Source{}, false, nil
 	}
 
-	repo, err := name.NewRepository(source.Repository)
+	repo, err := source.NewRepository()
 	if err != nil {
 		return Source{}, false, fmt.Errorf("parse repository: %w", err)
 	}
@@ -111,12 +125,21 @@ func (source Source) Mirror() (Source, bool, error) {
 	}
 
 	// resolve implicit namespace by re-parsing .Name()
-	mirror, err := name.NewRepository(repo.Name())
+	var mirror name.Repository
+	if source.Insecure {
+		mirror, err = name.NewRepository(repo.Name(), name.Insecure)
+	} else {
+		mirror, err = name.NewRepository(repo.Name())
+	}
 	if err != nil {
 		return Source{}, false, fmt.Errorf("resolve implicit namespace: %w", err)
 	}
 
-	mirror.Registry, err = name.NewRegistry(source.RegistryMirror.Host)
+	if source.Insecure {
+		mirror.Registry, err = name.NewRegistry(source.RegistryMirror.Host, name.Insecure)
+	} else {
+		mirror.Registry, err = name.NewRegistry(source.RegistryMirror.Host)
+	}
 	if err != nil {
 		return Source{}, false, fmt.Errorf("parse mirror registry: %w", err)
 	}

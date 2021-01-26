@@ -69,12 +69,8 @@ func (o *Out) Execute() error {
 
 	tagsToPush := []name.Tag{}
 
-	var repo name.Repository
-	if req.Source.Insecure {
-		repo, err = name.NewRepository(req.Source.Repository, name.Insecure)
-	} else {
-		repo, err = name.NewRepository(req.Source.Repository)
-	}
+	repo, err := req.Source.NewRepository()
+
 	if err != nil {
 		return fmt.Errorf("could not resolve repository: %w", err)
 	}
@@ -127,7 +123,7 @@ func (o *Out) Execute() error {
 	}
 
 	for _, tagName := range additionalTags {
-		tag, err := name.NewTag(fmt.Sprintf("%s:%s", req.Source.Repository, tagName))
+		tag, err := req.Source.NewTag(tagName)
 		if err != nil {
 			return fmt.Errorf("could not resolve repository/tag reference: %w", err)
 		}

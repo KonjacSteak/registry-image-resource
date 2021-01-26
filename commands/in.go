@@ -70,12 +70,7 @@ func (i *In) Execute() error {
 		}
 	}
 
-	var repo name.Repository
-	if req.Source.Insecure {
-		repo, err = name.NewRepository(req.Source.Repository, name.Insecure)
-	} else {
-		repo, err = name.NewRepository(req.Source.Repository)
-	}
+	repo, err := req.Source.NewRepository()
 	if err != nil {
 		return fmt.Errorf("failed to resolve repository: %w", err)
 	}
@@ -128,7 +123,7 @@ func (i *In) Execute() error {
 func downloadWithRetry(tag name.Tag, source resource.Source, params resource.GetParams, version resource.Version, dest string, stderr io.Writer) error {
 	fmt.Fprintf(os.Stderr, "fetching %s@%s\n", color.GreenString(source.Repository), color.YellowString(version.Digest))
 
-	repo, err := name.NewRepository(source.Repository)
+	repo, err := source.NewRepository()
 	if err != nil {
 		return fmt.Errorf("resolve repository name: %w", err)
 	}
